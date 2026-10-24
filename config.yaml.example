@@ -1,0 +1,34 @@
+server:
+  port: 8080
+  mode: debug  # debug | release | test
+
+database:
+  host: 127.0.0.1
+  port: 3306
+  user: root
+  password: ""
+  dbname: novel2comic
+  max_idle_conns: 10
+  max_open_conns: 100
+  conn_max_lifetime: 3600
+
+redis:
+  host: 127.0.0.1
+  port: 6379
+  password: ""
+  db: 0
+
+jwt:
+  secret: "change-me-in-production"
+  access_token_ttl: 15      # 分钟
+  refresh_token_ttl: 168    # 小时 (7天)
+
+sd:
+  base_url: ""               # A1111 地址，如 http://localhost:7860
+  api_key: ""                # Replicate API Key
+  max_concurrent: 2          # 最大并发生成数
+  request_timeout: 300       # 请求超时(秒)
+
+upload:
+  dir: "uploads/generated"
+  max_size: 10               # MB
