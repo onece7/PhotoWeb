@@ -16,11 +16,11 @@ import (
 
 // GenerationService 图片生成服务
 type GenerationService struct {
-	genRepo  repository.GenerationRepository
+	genRepo   repository.GenerationRepository
 	styleRepo repository.StyleRepository
-	sdClient *sdClient
-	cfg      *config.Config
-	sem      chan struct{} // 并发控制信号量
+	sdClient  *sdClient
+	cfg       *config.Config
+	sem       chan struct{} // 并发控制信号量
 }
 
 // NewGenerationService 创建生成 Service
@@ -150,7 +150,7 @@ func (s *GenerationService) GeneratePro(ctx context.Context, userID uint64, req 
 }
 
 // GetStatus 查询生成状态
-func (s *GenerationService) GetStatus(ctx context.Context, id uint64) (*models.GenerationRecord, error) {
+func (s *GenerationService) GetStatus(ctx context.Context, id uint64) (models.GenerationRecord, error) {
 	return s.genRepo.FindByID(ctx, id)
 }
 
@@ -168,7 +168,11 @@ func (s *GenerationService) processGeneration(recordID uint64) {
 		return
 	}
 	record.Status = models.StatusProcessing
-	s.genRepo.Update(ctx, record)
+	err = s.genRepo.Update(ctx, record)
+	if err != nil {
+		//TODO 打印日志
+		return
+	}
 
 	startTime := time.Now()
 
@@ -190,7 +194,11 @@ func (s *GenerationService) processGeneration(recordID uint64) {
 	if err != nil {
 		record.Status = models.StatusFailed
 		record.ErrorMessage = err.Error()
-		s.genRepo.Update(ctx, record)
+		err = s.genRepo.Update(ctx, record)
+		if err != nil {
+			//TODO 打印日志
+			return
+		}
 		return
 	}
 
@@ -199,7 +207,11 @@ func (s *GenerationService) processGeneration(recordID uint64) {
 	if err != nil {
 		record.Status = models.StatusFailed
 		record.ErrorMessage = fmt.Sprintf("保存图片失败: %v", err)
-		s.genRepo.Update(ctx, record)
+		err = s.genRepo.Update(ctx, record)
+		if err != nil {
+			//TODO 打印日志
+			return
+		}
 		return
 	}
 
@@ -207,7 +219,11 @@ func (s *GenerationService) processGeneration(recordID uint64) {
 	record.Status = models.StatusCompleted
 	record.ImageURL = imageURL
 	record.Seed = result.Seed
-	s.genRepo.Update(ctx, record)
+	err = s.genRepo.Update(ctx, record)
+	if err != nil {
+		//TODO 打印日志
+		return
+	}
 }
 
 // saveGeneratedImage 保存生成的图片到本地

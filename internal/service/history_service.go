@@ -42,15 +42,15 @@ func (s *HistoryService) GetHistory(ctx context.Context, userID uint64, page, pa
 }
 
 // GetHistoryDetail 获取历史详情
-func (s *HistoryService) GetHistoryDetail(ctx context.Context, id, userID uint64) (*models.GenerationRecord, error) {
+func (s *HistoryService) GetHistoryDetail(ctx context.Context, id, userID uint64) (models.GenerationRecord, error) {
 	record, err := s.genRepo.FindByID(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("记录不存在: %w", err)
+		return models.GenerationRecord{}, fmt.Errorf("记录不存在: %w", err)
 	}
 
 	// 验证归属
 	if record.UserID != userID {
-		return nil, fmt.Errorf("无权访问此记录")
+		return models.GenerationRecord{}, fmt.Errorf("无权访问此记录")
 	}
 
 	return record, nil

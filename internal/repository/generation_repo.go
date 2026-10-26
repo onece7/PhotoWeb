@@ -11,8 +11,8 @@ import (
 // GenerationRepository 生成记录数据访问接口
 type GenerationRepository interface {
 	Create(ctx context.Context, record *models.GenerationRecord) error
-	Update(ctx context.Context, record *models.GenerationRecord) error
-	FindByID(ctx context.Context, id uint64) (*models.GenerationRecord, error)
+	Update(ctx context.Context, record models.GenerationRecord) error
+	FindByID(ctx context.Context, id uint64) (models.GenerationRecord, error)
 	FindByUserID(ctx context.Context, userID uint64, page, pageSize int) ([]models.GenerationRecord, int64, error)
 	Delete(ctx context.Context, id uint64) error
 	CountPendingByUserID(ctx context.Context, userID uint64) (int64, error)
@@ -28,50 +28,51 @@ func NewGenerationRepository(db *gorm.DB) GenerationRepository {
 }
 
 func (r *generationRepo) Create(ctx context.Context, record *models.GenerationRecord) error {
-	return r.db.WithContext(ctx).Create(record).Error
+	err := gorm.G[models.GenerationRecord](r.db).Create(ctx, record)
+	return err
+
 }
 
-func (r *generationRepo) Update(ctx context.Context, record *models.GenerationRecord) error {
-	return r.db.WithContext(ctx).Save(record).Error
+func (r *generationRepo) Update(ctx context.Context, record models.GenerationRecord) error {
+	_, err := gorm.G[models.GenerationRecord](r.db).Where("id = ?", record.ID).Select("*").Updates(ctx, record)
+	return err
 }
 
-func (r *generationRepo) FindByID(ctx context.Context, id uint64) (*models.GenerationRecord, error) {
+func (r *generationRepo) FindByID(ctx context.Context, id uint64) (models.GenerationRecord, error) {
 	var record models.GenerationRecord
-	err := r.db.WithContext(ctx).Preload("Style").First(&record, id).Error
+	record, err := gorm.G[models.GenerationRecord](r.db).Preload("Style", nil).Where("id = ?", id).First(ctx)
 	if err != nil {
-		return nil, err
+		return models.GenerationRecord{}, err
 	}
-	return &record, nil
+	return record, nil
 }
 
 func (r *generationRepo) FindByUserID(ctx context.Context, userID uint64, page, pageSize int) ([]models.GenerationRecord, int64, error) {
-	var records []models.GenerationRecord
-	var total int64
+	query := gorm.G[models.GenerationRecord](r.db).Where("user_id = ?", userID)
 
-	query := r.db.WithContext(ctx).Model(&models.GenerationRecord{}).Where("user_id = ?", userID)
-
-	if err := query.Count(&total).Error; err != nil {
+	total, err := query.Count(ctx, "*")
+	if err != nil {
 		return nil, 0, err
 	}
 
 	offset := (page - 1) * pageSize
-	err := query.Preload("Style").
+	records, err := query.Preload("Style", nil).
 		Order("created_at DESC").
 		Offset(offset).
 		Limit(pageSize).
-		Find(&records).Error
+		Find(ctx)
 
 	return records, total, err
 }
 
 func (r *generationRepo) Delete(ctx context.Context, id uint64) error {
-	return r.db.WithContext(ctx).Delete(&models.GenerationRecord{}, id).Error
+	_, err := gorm.G[models.GenerationRecord](r.db).Where("id = ?", id).Delete(ctx)
+	return err
 }
 
 func (r *generationRepo) CountPendingByUserID(ctx context.Context, userID uint64) (int64, error) {
-	var count int64
-	err := r.db.WithContext(ctx).Model(&models.GenerationRecord{}).
+	count, err := gorm.G[models.GenerationRecord](r.db).
 		Where("user_id = ? AND status IN ?", userID, []string{models.StatusPending, models.StatusProcessing}).
-		Count(&count).Error
+		Count(ctx, "*")
 	return count, err
 }
