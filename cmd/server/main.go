@@ -18,7 +18,7 @@ import (
 	"novel2comic/backend/pkg/redis"
 	"novel2comic/backend/pkg/response"
 
-	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
@@ -82,7 +82,7 @@ func main() {
 
 	// 优雅关闭
 	go func() {
-		fmt.Printf("🚀 服务启动: http://localhost:%d\n", cfg.Server.Port)
+		fmt.Printf("服务启动: http://localhost:%d\n", cfg.Server.Port)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("服务启动失败: %v", err)
 		}
@@ -91,7 +91,7 @@ func main() {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
-	fmt.Println("\n🛑 正在关闭服务...")
+	fmt.Println("\n正在关闭服务...")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -99,7 +99,7 @@ func main() {
 	if err := srv.Shutdown(ctx); err != nil {
 		log.Fatalf("服务关闭失败: %v", err)
 	}
-	fmt.Println("✅ 服务已安全关闭")
+	fmt.Println("服务已安全关闭")
 }
 
 // seedStyles 首次启动时插入预设风格种子数据
@@ -117,32 +117,32 @@ func seedStyles(db *gorm.DB) {
 		{
 			Name: "anime", DisplayName: "动漫风格", Description: "日系动漫风格，色彩鲜艳，线条清晰",
 			PresetParams: models.JSONMap{"negative_prompt": "realistic, photo, 3d render", "cfg_scale": 7.0, "steps": float64(20), "sampler": "Euler a"},
-			SortOrder: 1, IsActive: true,
+			SortOrder:    1, IsActive: true,
 		},
 		{
 			Name: "realistic", DisplayName: "写实风格", Description: "照片级写实风格，细节丰富",
 			PresetParams: models.JSONMap{"negative_prompt": "cartoon, anime, illustration", "cfg_scale": 7.5, "steps": float64(30), "sampler": "DPM++ 2M Karras"},
-			SortOrder: 2, IsActive: true,
+			SortOrder:    2, IsActive: true,
 		},
 		{
 			Name: "watercolor", DisplayName: "水彩风格", Description: "柔和的水彩画风格",
 			PresetParams: models.JSONMap{"negative_prompt": "photo, realistic, 3d", "cfg_scale": 6.5, "steps": float64(25), "sampler": "Euler a"},
-			SortOrder: 3, IsActive: true,
+			SortOrder:    3, IsActive: true,
 		},
 		{
 			Name: "oil_painting", DisplayName: "油画风格", Description: "古典油画风格，笔触明显",
 			PresetParams: models.JSONMap{"negative_prompt": "photo, digital art, anime", "cfg_scale": 7.0, "steps": float64(30), "sampler": "DPM++ 2M Karras"},
-			SortOrder: 4, IsActive: true,
+			SortOrder:    4, IsActive: true,
 		},
 		{
 			Name: "pixel_art", DisplayName: "像素风格", Description: "复古像素艺术风格",
 			PresetParams: models.JSONMap{"negative_prompt": "realistic, smooth, high resolution", "cfg_scale": 7.0, "steps": float64(20), "sampler": "Euler a"},
-			SortOrder: 5, IsActive: true,
+			SortOrder:    5, IsActive: true,
 		},
 		{
 			Name: "sketch", DisplayName: "素描风格", Description: "黑白素描/线稿风格",
 			PresetParams: models.JSONMap{"negative_prompt": "color, painting, realistic", "cfg_scale": 6.0, "steps": float64(20), "sampler": "Euler a"},
-			SortOrder: 6, IsActive: true,
+			SortOrder:    6, IsActive: true,
 		},
 	}
 
@@ -150,7 +150,7 @@ func seedStyles(db *gorm.DB) {
 		log.Printf("插入种子风格数据失败: %v", err)
 		return
 	}
-	log.Println("✅ 已插入 6 条预设风格种子数据")
+	log.Println("已插入 6 条预设风格种子数据")
 }
 
 func initDB(cfg *config.Config) (*gorm.DB, error) {
@@ -159,7 +159,7 @@ func initDB(cfg *config.Config) (*gorm.DB, error) {
 		logLevel = logger.Warn
 	}
 
-	db, err := gorm.Open(mysql.Open(cfg.Database.DSN()), &gorm.Config{
+	db, err := gorm.Open(postgres.Open(cfg.Database.DSN()), &gorm.Config{
 		Logger: logger.Default.LogMode(logLevel),
 	})
 	if err != nil {

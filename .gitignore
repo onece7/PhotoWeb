@@ -14,9 +14,9 @@ go.work.sum
 vendor/
 
 # ==================== 环境配置（含敏感信息，勿提交） ====================
-.env
-.env.*
-!.env.example
+.yaml.example
+.yaml
+!.yaml.example
 config.yaml
 *.local
 

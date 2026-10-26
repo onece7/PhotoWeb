@@ -1,6 +1,10 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 // 生成模式
 const (
@@ -10,17 +14,17 @@ const (
 
 // 生成状态
 const (
-	StatusPending   = "pending"
+	StatusPending    = "pending"
 	StatusProcessing = "processing"
-	StatusCompleted = "completed"
-	StatusFailed    = "failed"
+	StatusCompleted  = "completed"
+	StatusFailed     = "failed"
 )
 
 // GenerationRecord 生成记录模型
 type GenerationRecord struct {
-	ID             uint64    `gorm:"primaryKey;autoIncrement" json:"id"`
+	ID             uint64    `gorm:"primaryKey; autoIncrement" json:"id"`
 	UserID         uint64    `gorm:"index;not null" json:"user_id"`
-	Mode           string    `gorm:"type:enum('simple','pro');not null" json:"mode"`
+	Mode           string    `gorm:"not null" json:"mode"`
 	Prompt         string    `gorm:"type:text;not null" json:"prompt"`
 	NegativePrompt string    `gorm:"type:text" json:"negative_prompt"`
 	StyleID        *uint64   `gorm:"default:null" json:"style_id"`
@@ -32,13 +36,15 @@ type GenerationRecord struct {
 	Seed           int64     `gorm:"default:-1" json:"seed"`
 	ImageURL       string    `gorm:"type:varchar(512)" json:"image_url"`
 	ThumbnailURL   string    `gorm:"type:varchar(512)" json:"thumbnail_url"`
-	Status         string    `gorm:"type:enum('pending','processing','completed','failed');default:'pending';index" json:"status"`
+	Status         string    `gorm:"default:'pending'" json:"status"`
 	ErrorMessage   string    `gorm:"type:text" json:"error_message"`
 	DurationMs     int64     `gorm:"default:0" json:"duration_ms"`
-	CreatedAt      time.Time `gorm:"autoCreateTime;index" json:"created_at"`
+	CreatedAt      time.Time `gorm:"autoCreateTime" json:"created_at"`
+	UpdatedAt      time.Time `gorm:"autoUpdateTime" json:"updated_at"`
+	gorm.DeletedAt
 
 	// 关联
-	User  User       `gorm:"foreignKey:UserID" json:"-"`
+	User  User        `gorm:"foreignKey:UserID" json:"-"`
 	Style *ImageStyle `gorm:"foreignKey:StyleID" json:"style,omitempty"`
 }
 

@@ -51,7 +51,7 @@ backend/
 
 ```bash
 # 方式一：环境变量
-cp .env.example .env
+cp .yaml.example .env
 
 # 方式二：YAML 配置
 cp config.yaml.example config.yaml
@@ -101,4 +101,4 @@ docker run --rm -p 8080:8080 \
 
 ## 配置项
 
-完整配置项见 [config.yaml.example](./config.yaml.example) 与 [.env.example](./.env.example)。生产环境请务必修改 `N2C_JWT_SECRET` 与数据库、Redis 密码。
+完整配置项见 [config.yaml.example](./config.yaml.example) 与 [.env.example](.yaml.example)。生产环境请务必修改 `N2C_JWT_SECRET` 与数据库、Redis 密码。

@@ -1,6 +1,10 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 // User 用户模型
 type User struct {
@@ -10,6 +14,7 @@ type User struct {
 	PasswordHash string    `gorm:"type:varchar(255);not null" json:"-"`
 	CreatedAt    time.Time `gorm:"autoCreateTime" json:"created_at"`
 	UpdatedAt    time.Time `gorm:"autoUpdateTime" json:"updated_at"`
+	gorm.DeletedAt
 }
 
 // TableName 自定义表名

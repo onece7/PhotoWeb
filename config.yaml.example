@@ -4,10 +4,10 @@ server:
 
 database:
   host: 127.0.0.1
-  port: 3306
-  user: root
+  port: 5432
+  user: user
   password: ""
-  dbname: novel2comic
+  dbname: postgres
   max_idle_conns: 10
   max_open_conns: 100
   conn_max_lifetime: 3600

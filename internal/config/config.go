@@ -29,15 +29,15 @@ type DatabaseConfig struct {
 	User            string `mapstructure:"user"`
 	Password        string `mapstructure:"password"`
 	DBName          string `mapstructure:"dbname"`
+	SearchPath      string `mapstructure:"search_path"`
 	MaxIdleConns    int    `mapstructure:"max_idle_conns"`
 	MaxOpenConns    int    `mapstructure:"max_open_conns"`
-	ConnMaxLifetime int    `mapstructure:"conn_max_lifetime"` // 秒
+	ConnMaxLifetime int    `mapstructure:"conn_max_lifetime"`
 }
 
-// DSN 返回 MySQL 连接字符串
 func (d *DatabaseConfig) DSN() string {
-	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-		d.User, d.Password, d.Host, d.Port, d.DBName)
+	return fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+		d.Host, d.Port, d.User, d.Password, d.DBName)
 }
 
 // RedisConfig Redis 配置
@@ -55,23 +55,23 @@ func (r *RedisConfig) Addr() string {
 
 // JWTConfig JWT 配置
 type JWTConfig struct {
-	Secret           string `mapstructure:"secret"`
-	AccessTokenTTL   int    `mapstructure:"access_token_ttl"`   // 分钟
-	RefreshTokenTTL  int    `mapstructure:"refresh_token_ttl"`  // 小时
+	Secret          string `mapstructure:"secret"`
+	AccessTokenTTL  int    `mapstructure:"access_token_ttl"`  // 分钟
+	RefreshTokenTTL int    `mapstructure:"refresh_token_ttl"` // 小时
 }
 
 // SDConfig Stable Diffusion 配置
 type SDConfig struct {
 	BaseURL        string `mapstructure:"base_url"`        // A1111 地址
-	APIKey         string `mapstructure:"api_key"`          // Replicate API Key
-	MaxConcurrent  int    `mapstructure:"max_concurrent"`   // 最大并发数
-	RequestTimeout int    `mapstructure:"request_timeout"`  // 请求超时(秒)
+	APIKey         string `mapstructure:"api_key"`         // Replicate API Key
+	MaxConcurrent  int    `mapstructure:"max_concurrent"`  // 最大并发数
+	RequestTimeout int    `mapstructure:"request_timeout"` // 请求超时(秒)
 }
 
 // UploadConfig 上传配置
 type UploadConfig struct {
-	Dir      string `mapstructure:"dir"`       // 图片存储目录
-	MaxSize  int64  `mapstructure:"max_size"`  // 最大文件大小(MB)
+	Dir     string `mapstructure:"dir"`      // 图片存储目录
+	MaxSize int64  `mapstructure:"max_size"` // 最大文件大小(MB)
 }
 
 // Load 加载配置: 先读 config.yaml，环境变量可覆盖
@@ -91,7 +91,7 @@ func Load() (*Config, error) {
 	// 设置默认值
 	setDefaults(v)
 
-	// 读取配置文件 (可选，不存在时使用默认值+环境变量)
+	// 读取配置文件
 	if err := v.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
 			return nil, fmt.Errorf("读取配置文件失败: %w", err)
@@ -112,10 +112,10 @@ func setDefaults(v *viper.Viper) {
 	v.SetDefault("server.mode", "debug")
 
 	v.SetDefault("database.host", "127.0.0.1")
-	v.SetDefault("database.port", 3306)
-	v.SetDefault("database.user", "root")
+	v.SetDefault("database.port", 5432)
+	v.SetDefault("database.user", "postgres")
 	v.SetDefault("database.password", "")
-	v.SetDefault("database.dbname", "novel2comic")
+	v.SetDefault("database.dbname", "novel_photo")
 	v.SetDefault("database.max_idle_conns", 10)
 	v.SetDefault("database.max_open_conns", 100)
 	v.SetDefault("database.conn_max_lifetime", 3600)

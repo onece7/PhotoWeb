@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 // JSONMap 自定义 JSON 类型，用于存储 SD 预设参数
@@ -43,6 +45,7 @@ type ImageStyle struct {
 	IsActive     bool      `gorm:"default:true" json:"is_active"`
 	CreatedAt    time.Time `gorm:"autoCreateTime" json:"created_at"`
 	UpdatedAt    time.Time `gorm:"autoUpdateTime" json:"updated_at"`
+	gorm.DeletedAt
 }
 
 // TableName 自定义表名
