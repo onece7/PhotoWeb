@@ -28,6 +28,7 @@ uploads/generated/*
 coverage.out
 coverage.html
 *.cover
+*_test.go
 
 # ==================== 日志 ====================
 *.log

@@ -36,6 +36,10 @@ type DatabaseConfig struct {
 }
 
 func (d *DatabaseConfig) DSN() string {
+	if d.Password == "" {
+		return fmt.Sprintf("host=%s port=%d user=%s dbname=%s sslmode=disable",
+			d.Host, d.Port, d.User, d.DBName)
+	}
 	return fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		d.Host, d.Port, d.User, d.Password, d.DBName)
 }
@@ -115,7 +119,7 @@ func setDefaults(v *viper.Viper) {
 	v.SetDefault("database.port", 5432)
 	v.SetDefault("database.user", "postgres")
 	v.SetDefault("database.password", "")
-	v.SetDefault("database.dbname", "novel_photo")
+	v.SetDefault("database.dbname", "novel_photo_test")
 	v.SetDefault("database.max_idle_conns", 10)
 	v.SetDefault("database.max_open_conns", 100)
 	v.SetDefault("database.conn_max_lifetime", 3600)

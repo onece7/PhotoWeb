@@ -35,17 +35,17 @@ func (j JSONMap) Value() (driver.Value, error) {
 
 // ImageStyle 图片风格预设模型
 type ImageStyle struct {
-	ID           uint64    `gorm:"primaryKey;autoIncrement" json:"id"`
-	Name         string    `gorm:"type:varchar(64);uniqueIndex;not null" json:"name"`
-	DisplayName  string    `gorm:"type:varchar(128);not null" json:"display_name"`
-	Description  string    `gorm:"type:text" json:"description"`
-	PresetParams JSONMap   `gorm:"type:json" json:"preset_params"`
-	SortOrder    int       `gorm:"default:0" json:"sort_order"`
-	PreviewURL   string    `gorm:"type:varchar(512)" json:"preview_url"`
-	IsActive     bool      `gorm:"default:true" json:"is_active"`
-	CreatedAt    time.Time `gorm:"autoCreateTime" json:"created_at"`
-	UpdatedAt    time.Time `gorm:"autoUpdateTime" json:"updated_at"`
-	gorm.DeletedAt
+	ID           uint64         `gorm:"primaryKey;autoIncrement" json:"id"`
+	Name         string         `gorm:"type:varchar(64);uniqueIndex;not null" json:"name"`
+	DisplayName  string         `gorm:"type:varchar(128);not null" json:"display_name"`
+	Description  string         `gorm:"type:text" json:"description"`
+	PresetParams JSONMap        `gorm:"type:json" json:"preset_params"`
+	SortOrder    int            `gorm:"default:0" json:"sort_order"`
+	PreviewURL   string         `gorm:"type:varchar(512)" json:"preview_url"`
+	IsActive     bool           `gorm:"default:true" json:"is_active"`
+	CreatedAt    time.Time      `gorm:"autoCreateTime" json:"created_at"`
+	UpdatedAt    time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
+	DeletedAt    gorm.DeletedAt `gorm:"index" json:"-"`
 }
 
 // TableName 自定义表名

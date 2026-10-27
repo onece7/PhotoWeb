@@ -22,26 +22,26 @@ const (
 
 // GenerationRecord 生成记录模型
 type GenerationRecord struct {
-	ID             uint64    `gorm:"primaryKey; autoIncrement" json:"id"`
-	UserID         uint64    `gorm:"index;not null" json:"user_id"`
-	Mode           string    `gorm:"not null" json:"mode"`
-	Prompt         string    `gorm:"type:text;not null" json:"prompt"`
-	NegativePrompt string    `gorm:"type:text" json:"negative_prompt"`
-	StyleID        *uint64   `gorm:"default:null" json:"style_id"`
-	Width          int       `gorm:"default:512" json:"width"`
-	Height         int       `gorm:"default:512" json:"height"`
-	CFGScale       float64   `gorm:"default:7.0" json:"cfg_scale"`
-	Steps          int       `gorm:"default:20" json:"steps"`
-	Sampler        string    `gorm:"type:varchar(64);default:'Euler a'" json:"sampler"`
-	Seed           int64     `gorm:"default:-1" json:"seed"`
-	ImageURL       string    `gorm:"type:varchar(512)" json:"image_url"`
-	ThumbnailURL   string    `gorm:"type:varchar(512)" json:"thumbnail_url"`
-	Status         string    `gorm:"default:'pending'" json:"status"`
-	ErrorMessage   string    `gorm:"type:text" json:"error_message"`
-	DurationMs     int64     `gorm:"default:0" json:"duration_ms"`
-	CreatedAt      time.Time `gorm:"autoCreateTime" json:"created_at"`
-	UpdatedAt      time.Time `gorm:"autoUpdateTime" json:"updated_at"`
-	gorm.DeletedAt
+	ID             uint64         `gorm:"primaryKey; autoIncrement" json:"id"`
+	UserID         uint64         `gorm:"index;not null" json:"user_id"`
+	Mode           string         `gorm:"not null" json:"mode"`
+	Prompt         string         `gorm:"type:text;not null" json:"prompt"`
+	NegativePrompt string         `gorm:"type:text" json:"negative_prompt"`
+	StyleID        *uint64        `gorm:"default:null" json:"style_id"`
+	Width          int            `gorm:"default:512" json:"width"`
+	Height         int            `gorm:"default:512" json:"height"`
+	CFGScale       float64        `gorm:"default:7.0" json:"cfg_scale"`
+	Steps          int            `gorm:"default:20" json:"steps"`
+	Sampler        string         `gorm:"type:varchar(64);default:'Euler a'" json:"sampler"`
+	Seed           int64          `gorm:"default:-1" json:"seed"`
+	ImageURL       string         `gorm:"type:varchar(512)" json:"image_url"`
+	ThumbnailURL   string         `gorm:"type:varchar(512)" json:"thumbnail_url"`
+	Status         string         `gorm:"default:'pending'" json:"status"`
+	ErrorMessage   string         `gorm:"type:text" json:"error_message"`
+	DurationMs     int64          `gorm:"default:0" json:"duration_ms"`
+	CreatedAt      time.Time      `gorm:"autoCreateTime" json:"created_at"`
+	UpdatedAt      time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
+	DeletedAt      gorm.DeletedAt `gorm:"index" json:"-"`
 
 	// 关联
 	User  User        `gorm:"foreignKey:UserID" json:"-"`
