@@ -26,20 +26,17 @@ func NewStyleRepository(db *gorm.DB) StyleRepository {
 }
 
 func (r *styleRepo) FindAll(ctx context.Context) ([]models.ImageStyle, error) {
-	var styles []models.ImageStyle
-	err := r.db.WithContext(ctx).Order("sort_order ASC").Find(&styles).Error
+	styles, err := gorm.G[models.ImageStyle](r.db).Order("sort_order ASC").Find(ctx)
 	return styles, err
 }
 
 func (r *styleRepo) FindActive(ctx context.Context) ([]models.ImageStyle, error) {
-	var styles []models.ImageStyle
-	err := r.db.WithContext(ctx).Where("is_active = ?", true).Order("sort_order ASC").Find(&styles).Error
+	styles, err := gorm.G[models.ImageStyle](r.db).Where("is_active = ?", true).Order("sort_order ASC").Find(ctx)
 	return styles, err
 }
 
 func (r *styleRepo) FindByID(ctx context.Context, id uint64) (*models.ImageStyle, error) {
-	var style models.ImageStyle
-	err := r.db.WithContext(ctx).First(&style, id).Error
+	style, err := gorm.G[models.ImageStyle](r.db).Where("id = ?", id).First(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -47,8 +44,7 @@ func (r *styleRepo) FindByID(ctx context.Context, id uint64) (*models.ImageStyle
 }
 
 func (r *styleRepo) FindByName(ctx context.Context, name string) (*models.ImageStyle, error) {
-	var style models.ImageStyle
-	err := r.db.WithContext(ctx).Where("name = ?", name).First(&style).Error
+	style, err := gorm.G[models.ImageStyle](r.db).Where("name = ?", name).First(ctx)
 	if err != nil {
 		return nil, err
 	}

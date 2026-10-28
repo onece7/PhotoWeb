@@ -39,7 +39,6 @@ func (r *generationRepo) Update(ctx context.Context, record models.GenerationRec
 }
 
 func (r *generationRepo) FindByID(ctx context.Context, id uint64) (models.GenerationRecord, error) {
-	var record models.GenerationRecord
 	record, err := gorm.G[models.GenerationRecord](r.db).Preload("Style", nil).Where("id = ?", id).First(ctx)
 	if err != nil {
 		return models.GenerationRecord{}, err

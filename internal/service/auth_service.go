@@ -99,7 +99,7 @@ func (s *AuthService) RefreshToken(ctx context.Context, refreshToken string) (*m
 	}
 
 	// 删除旧的 Refresh Token (轮换)
-	s.redis.Del(ctx, key)
+	_ = s.redis.Del(ctx, key)
 
 	// 查找用户
 	var userID uint64

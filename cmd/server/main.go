@@ -84,7 +84,7 @@ func main() {
 	go func() {
 		fmt.Printf("服务启动: http://localhost:%d\n", cfg.Server.Port)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("服务启动失败: %v", err)
+			log.Fatalf("服务关闭: %v", err)
 		}
 	}()
 
@@ -104,8 +104,9 @@ func main() {
 
 // seedStyles 首次启动时插入预设风格种子数据
 func seedStyles(db *gorm.DB) {
-	var count int64
-	if err := db.Model(&models.ImageStyle{}).Count(&count).Error; err != nil {
+	ctx := context.Background()
+	count, err := gorm.G[models.ImageStyle](db).Count(ctx, "*")
+	if err != nil {
 		log.Printf("检查风格数据失败: %v", err)
 		return
 	}
@@ -146,7 +147,8 @@ func seedStyles(db *gorm.DB) {
 		},
 	}
 
-	if err := db.Create(&styles).Error; err != nil {
+	err = gorm.G[models.ImageStyle](db).CreateInBatches(ctx, &styles, 100)
+	if err != nil {
 		log.Printf("插入种子风格数据失败: %v", err)
 		return
 	}

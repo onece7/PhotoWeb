@@ -14,7 +14,7 @@ type UserRepository interface {
 	FindByID(ctx context.Context, id uint64) (*models.User, error)
 	FindByUsername(ctx context.Context, username string) (*models.User, error)
 	FindByPhone(ctx context.Context, phone string) (*models.User, error)
-	Update(ctx context.Context, user *models.User) error
+	Update(ctx context.Context, user models.User) error
 }
 
 type userRepo struct {
@@ -27,12 +27,12 @@ func NewUserRepository(db *gorm.DB) UserRepository {
 }
 
 func (r *userRepo) Create(ctx context.Context, user *models.User) error {
-	return r.db.WithContext(ctx).Create(user).Error
+	err := gorm.G[models.User](r.db).Create(ctx, user)
+	return err
 }
 
 func (r *userRepo) FindByID(ctx context.Context, id uint64) (*models.User, error) {
-	var user models.User
-	err := r.db.WithContext(ctx).First(&user, id).Error
+	user, err := gorm.G[models.User](r.db).Where("id = ?", id).First(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -40,8 +40,7 @@ func (r *userRepo) FindByID(ctx context.Context, id uint64) (*models.User, error
 }
 
 func (r *userRepo) FindByUsername(ctx context.Context, username string) (*models.User, error) {
-	var user models.User
-	err := r.db.WithContext(ctx).Where("username = ?", username).First(&user).Error
+	user, err := gorm.G[models.User](r.db).Where("username = ?", username).First(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -49,14 +48,14 @@ func (r *userRepo) FindByUsername(ctx context.Context, username string) (*models
 }
 
 func (r *userRepo) FindByPhone(ctx context.Context, phone string) (*models.User, error) {
-	var user models.User
-	err := r.db.WithContext(ctx).Where("phone = ?", phone).First(&user).Error
+	user, err := gorm.G[models.User](r.db).Where("phone = ?", phone).First(ctx)
 	if err != nil {
 		return nil, err
 	}
 	return &user, nil
 }
 
-func (r *userRepo) Update(ctx context.Context, user *models.User) error {
-	return r.db.WithContext(ctx).Save(user).Error
+func (r *userRepo) Update(ctx context.Context, user models.User) error {
+	_, err := gorm.G[models.User](r.db).Where("id = ?", user.ID).Select("*").Updates(ctx, user)
+	return err
 }
