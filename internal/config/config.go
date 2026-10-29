@@ -66,10 +66,14 @@ type JWTConfig struct {
 
 // SDConfig Stable Diffusion 配置
 type SDConfig struct {
+	Provider       string `mapstructure:"provider"`
 	BaseURL        string `mapstructure:"base_url"`        // A1111 地址
 	APIKey         string `mapstructure:"api_key"`         // Replicate API Key
 	MaxConcurrent  int    `mapstructure:"max_concurrent"`  // 最大并发数
 	RequestTimeout int    `mapstructure:"request_timeout"` // 请求超时(秒)
+
+	MockImageDir string `mapstructure:"mock_image_dir"`
+	MockDelayMs  int    `mapstructure:"mock_delay_ms"`
 }
 
 // UploadConfig 上传配置
@@ -133,8 +137,11 @@ func setDefaults(v *viper.Viper) {
 	v.SetDefault("jwt.access_token_ttl", 15)
 	v.SetDefault("jwt.refresh_token_ttl", 168) // 7 天
 
+	v.SetDefault("sd.provider", "")
 	v.SetDefault("sd.max_concurrent", 2)
 	v.SetDefault("sd.request_timeout", 300)
+	v.SetDefault("sd.mock_image_dir", "uploads/local_image")
+	v.SetDefault("sd.mock_delay_ms", 1200)
 
 	v.SetDefault("upload.dir", "uploads/generated")
 	v.SetDefault("upload.max_size", 10)

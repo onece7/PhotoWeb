@@ -3,11 +3,18 @@ package service
 import (
 	"bytes"
 	"context"
+	"crypto/sha256"
 	"encoding/base64"
+	"encoding/binary"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
+	"os"
+	"path/filepath"
+	"sort"
+	"strings"
 	"time"
 
 	"novel2comic/backend/internal/config"
@@ -36,23 +43,38 @@ type GenerateResult struct {
 	Seed      int64  `json:"seed"`
 }
 
+type mockProvider struct {
+	dir   string
+	delay time.Duration
+}
+
 // sdClient SD 客户端实现
 type sdClient struct {
-	cfg       *config.Config
-	provider  SDProvider
+	cfg      *config.Config
+	provider SDProvider
 }
 
 // NewSDClient 创建 SD 客户端 (根据配置选择实现)
 func NewSDClient(cfg *config.Config) *sdClient {
 	c := &sdClient{cfg: cfg}
 
-	// 配置驱动选择后端
-	if cfg.SD.APIKey != "" {
-		c.provider = &replicateProvider{apiKey: cfg.SD.APIKey}
-	} else if cfg.SD.BaseURL != "" {
+	switch strings.ToLower(strings.TrimSpace(cfg.SD.Provider)) {
+	case "mock":
+		c.provider = &mockProvider{
+			dir:   cfg.SD.MockImageDir,
+			delay: time.Duration(cfg.SD.MockDelayMs) * time.Millisecond,
+		}
+	case "a1111":
 		c.provider = &a1111Provider{baseURL: cfg.SD.BaseURL}
+	case "replicate":
+		c.provider = &replicateProvider{apiKey: cfg.SD.APIKey}
+	case "":
+		if cfg.SD.APIKey != "" {
+			c.provider = &replicateProvider{apiKey: cfg.SD.APIKey}
+		} else if cfg.SD.BaseURL != "" {
+			c.provider = &a1111Provider{baseURL: cfg.SD.BaseURL}
+		}
 	}
-	// 如果都没配置，provider 为 nil，后续生成时返回错误
 
 	return c
 }
@@ -70,6 +92,70 @@ func (c *sdClient) IsConfigured() bool {
 	return c.provider != nil
 }
 
+// ============ mock 实现 ============
+
+func (mp *mockProvider) Generate(ctx context.Context, params *GenerateParams) (*GenerateResult, error) {
+	select {
+	case <-time.After(mp.delay):
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	}
+
+	files, err := imageFiles(mp.dir)
+	if err != nil {
+		return nil, fmt.Errorf("读取演示图片目录失败: %w", err)
+	}
+	if len(files) == 0 {
+		return nil, errors.New("演示图片目录为空")
+	}
+
+	index := stableIndex(params, len(files))
+	data, err := os.ReadFile(files[index])
+	if err != nil {
+		return nil, err
+	}
+
+	return &GenerateResult{ImageData: data, Seed: int64(index)}, nil
+
+}
+
+func imageFiles(dir string) ([]string, error) {
+	files, err := os.ReadDir(dir)
+	if err != nil {
+		return nil, err
+	}
+
+	pathLists := make([]string, 0, len(files))
+
+	for _, f := range files {
+		if f.IsDir() {
+			continue
+		}
+		switch strings.ToLower(filepath.Ext(f.Name())) {
+		case ".jpg", ".jpeg", ".png", ".webp":
+			pathLists = append(pathLists, filepath.Join(dir, f.Name()))
+		default:
+			continue
+		}
+	}
+	sort.Strings(pathLists)
+	return pathLists, nil
+}
+
+func stableIndex(params *GenerateParams, size int) int {
+	h := sha256.New()
+	fmt.Fprintf(h, "%s|%s|%d|%d",
+		params.Prompt,
+		params.NegativePrompt,
+		params.Width,
+		params.Height,
+	)
+
+	sum := h.Sum(nil)
+	value := binary.BigEndian.Uint64(sum[:8])
+	return int(value % uint64(size))
+}
+
 // ============ A1111 实现 ============
 
 type a1111Provider struct {
@@ -78,21 +164,21 @@ type a1111Provider struct {
 
 // a1111Request A1111 txt2img 请求结构
 type a1111Request struct {
-	Prompt         string `json:"prompt"`
-	NegativePrompt string `json:"negative_prompt"`
-	Width          int    `json:"width"`
-	Height         int    `json:"height"`
-	Steps          int    `json:"steps"`
+	Prompt         string  `json:"prompt"`
+	NegativePrompt string  `json:"negative_prompt"`
+	Width          int     `json:"width"`
+	Height         int     `json:"height"`
+	Steps          int     `json:"steps"`
 	CFGScale       float64 `json:"cfg_scale"`
-	SamplerName    string `json:"sampler_name"`
+	SamplerName    string  `json:"sampler_name"`
 	Seed           int64   `json:"seed"`
 }
 
 // a1111Response A1111 txt2img 响应结构
 type a1111Response struct {
-	Images     []string `json:"images"` // base64 编码的图片
+	Images     []string               `json:"images"` // base64 编码的图片
 	Parameters map[string]interface{} `json:"parameters"`
-	Info       string   `json:"info"`
+	Info       string                 `json:"info"`
 }
 
 func (p *a1111Provider) Generate(ctx context.Context, params *GenerateParams) (*GenerateResult, error) {

@@ -124,7 +124,7 @@ func (h *GenerationHandler) GetGenerationStatus(c *gin.Context) {
 	}
 
 	if record.Status == models.StatusCompleted && record.ImageURL != "" {
-		statusResp.ImageURL = "/api/v1/files/" + record.ImageURL
+		statusResp.ImageURL = record.ImageURL
 	}
 
 	response.Success(c, statusResp)

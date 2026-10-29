@@ -5,9 +5,9 @@ server:
 database:
   host: 127.0.0.1
   port: 5432
-  user: user
+  user: postgres
   password: ""
-  dbname: postgres
+  dbname: novel_photo_test
   max_idle_conns: 10
   max_open_conns: 100
   conn_max_lifetime: 3600
@@ -24,10 +24,13 @@ jwt:
   refresh_token_ttl: 168    # 小时 (7天)
 
 sd:
+  provider: mock             # mock | a1111 | replicate
   base_url: ""               # A1111 地址，如 http://localhost:7860
   api_key: ""                # Replicate API Key
   max_concurrent: 2          # 最大并发生成数
   request_timeout: 300       # 请求超时(秒)
+  mock_image_dir: "uploads/local_image"
+  mock_delay_ms: 1200
 
 upload:
   dir: "uploads/generated"

@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 
@@ -9,19 +11,21 @@ import (
 )
 
 // ServeGeneratedFile 提供生成的图片文件
-// GET /api/v1/files/:filename
+// GET /api/v1/files/*filepath
 func ServeGeneratedFile(uploadDir string) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		filename := c.Param("filename")
+		requestedPath := strings.TrimPrefix(c.Param("filepath"), string(os.PathSeparator))
+		cleanPath := filepath.Clean(requestedPath)
 
 		// 安全检查：防止路径遍历
-		cleanPath := filepath.Clean(filename)
-		if cleanPath != filename {
+		if cleanPath == "." ||
+			cleanPath == ".." ||
+			strings.HasPrefix(cleanPath, ".."+string(os.PathSeparator)) {
 			response.BadRequest(c, "无效的文件路径")
 			return
 		}
 
-		filePath := filepath.Join(uploadDir, filename)
-		c.File(filePath)
+		resolvedPath := filepath.Join(uploadDir, cleanPath)
+		c.File(resolvedPath)
 	}
 }
