@@ -5,8 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"novel2comic/backend/internal/service"
-	"novel2comic/backend/pkg/response"
+	"photo-web/internal/service"
+	"photo-web/pkg/response"
 )
 
 // HistoryHandler 历史记录处理器

@@ -6,8 +6,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"novel2comic/backend/internal/models"
-	"novel2comic/backend/internal/repository"
+	"photo-web/internal/models"
+	"photo-web/internal/repository"
 )
 
 // HistoryService 历史记录服务

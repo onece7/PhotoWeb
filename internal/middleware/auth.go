@@ -8,9 +8,9 @@ import (
 	"github.com/gin-gonic/gin"
 	jwtv5 "github.com/golang-jwt/jwt/v5"
 
-	"novel2comic/backend/internal/service"
-	"novel2comic/backend/pkg/jwt"
-	"novel2comic/backend/pkg/response"
+	"photo-web/internal/service"
+	"photo-web/pkg/jwt"
+	"photo-web/pkg/response"
 )
 
 // AuthRequired 认证中间件：验证 JWT Token

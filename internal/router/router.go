@@ -3,11 +3,11 @@ package router
 import (
 	"github.com/gin-gonic/gin"
 
-	"novel2comic/backend/internal/config"
-	"novel2comic/backend/internal/handlers"
-	"novel2comic/backend/internal/middleware"
-	"novel2comic/backend/internal/service"
-	jwtpkg "novel2comic/backend/pkg/jwt"
+	"photo-web/internal/config"
+	"photo-web/internal/handlers"
+	"photo-web/internal/middleware"
+	"photo-web/internal/service"
+	jwtpkg "photo-web/pkg/jwt"
 )
 
 // Setup 初始化路由

@@ -12,11 +12,11 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 
-	"novel2comic/backend/internal/config"
-	"novel2comic/backend/internal/models"
-	"novel2comic/backend/internal/repository"
-	jwtpkg "novel2comic/backend/pkg/jwt"
-	redisCli "novel2comic/backend/pkg/redis"
+	"photo-web/internal/config"
+	"photo-web/internal/models"
+	"photo-web/internal/repository"
+	jwtpkg "photo-web/pkg/jwt"
+	redisCli "photo-web/pkg/redis"
 )
 
 // AuthService 认证业务逻辑

@@ -5,7 +5,7 @@ import (
 
 	"gorm.io/gorm"
 
-	"novel2comic/backend/internal/models"
+	"photo-web/internal/models"
 )
 
 // StyleRepository 风格数据访问接口

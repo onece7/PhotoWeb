@@ -9,9 +9,9 @@ import (
 
 	"github.com/google/uuid"
 
-	"novel2comic/backend/internal/config"
-	"novel2comic/backend/internal/models"
-	"novel2comic/backend/internal/repository"
+	"photo-web/internal/config"
+	"photo-web/internal/models"
+	"photo-web/internal/repository"
 )
 
 // GenerationService 图片生成服务

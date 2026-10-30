@@ -1,4 +1,4 @@
-module novel2comic/backend
+module photo-web
 
 go 1.25.0
 

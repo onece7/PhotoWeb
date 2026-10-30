@@ -6,9 +6,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"novel2comic/backend/internal/models"
-	"novel2comic/backend/internal/service"
-	"novel2comic/backend/pkg/response"
+	"photo-web/internal/models"
+	"photo-web/internal/service"
+	"photo-web/pkg/response"
 )
 
 // GenerationHandler 图片生成处理器

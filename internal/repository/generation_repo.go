@@ -5,7 +5,7 @@ import (
 
 	"gorm.io/gorm"
 
-	"novel2comic/backend/internal/models"
+	"photo-web/internal/models"
 )
 
 // GenerationRepository 生成记录数据访问接口

@@ -7,7 +7,7 @@ import (
 
 	"github.com/redis/go-redis/v9"
 
-	"novel2comic/backend/internal/config"
+	"photo-web/internal/config"
 )
 
 // Client Redis 客户端封装

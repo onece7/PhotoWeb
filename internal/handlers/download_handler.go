@@ -7,7 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"novel2comic/backend/pkg/response"
+	"photo-web/pkg/response"
 )
 
 // ServeGeneratedFile 提供生成的图片文件

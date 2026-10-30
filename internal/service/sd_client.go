@@ -17,7 +17,7 @@ import (
 	"strings"
 	"time"
 
-	"novel2comic/backend/internal/config"
+	"photo-web/internal/config"
 )
 
 // SDProvider SD 生图接口抽象
